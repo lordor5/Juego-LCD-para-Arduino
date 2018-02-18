@@ -67,6 +67,14 @@ bool soltado1;
 
 int especial;
 
+bool menu;
+bool juego;
+
+int posCur;
+
+
+
+
 void asignarVariables() {
 
 pos = 14;
@@ -111,11 +119,61 @@ void setup() {
   lcd.createChar(1, coche);
   lcd.createChar(2, obstaculo);
 }
-void loop() { 
-  
-  while(true){
+void loop() {
+  menu = true; 
+  while (menu == true){
+
+  lec1 = digitalRead(10);
+  lec2 = digitalRead(9);
+  lec3 = digitalRead(8);
+
+    if ((lec2 == 1)and(soltado1 == true)){
+      if (pos == 15){
+        pos = 15;
+        }
+      else {
+        pos = pos +1;
+        }
+      soltado1 = false;
+      lcd.clear();
+      }
+    if ((lec3 == 1)and(soltado == true)){
+      if (pos == 0){
+        pos = 0;
+        }
+      else {
+        pos = pos -1;
+        }
+      soltado = false;
+      lcd.clear();
+      }
+    if (lec3 == 0){
+    soltado = true;
+    }
+    if (lec2 == 0){
+    soltado1 = true;
+    }    
+    lcd.setCursor(pos,1); 
+    lcd.write(2);
+
+    lcd.setCursor(10,0);
+    lcd.print("Coche");
+
+    delay(1);
+    
+    if (lec1 == 1){
+      if ((pos < 14)and(pos > 10)){
+        juego = true;
+        }
+      else{
+        juego = false;
+        }
+      }
+  while(juego == true){
     
     juego1();
+    
+   }
   }
  }
  void juego1() {
