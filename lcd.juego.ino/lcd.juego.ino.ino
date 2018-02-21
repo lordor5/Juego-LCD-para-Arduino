@@ -28,8 +28,8 @@ int lec1;
 int lec2;
 int lec3;
 
-int pos = 14;
-int pos1 = 1;
+int pos = 12;
+int pos1 = 0;
 
 int a = 0;
 int a1;
@@ -62,9 +62,12 @@ int rapi = 600;
 
 bool reset = true;
 bool pausa = true;
+
 bool soltado;
 bool soltado1;
+bool soltado2;
 
+int ira;
 int especial;
 
 bool menu;
@@ -72,13 +75,15 @@ bool juego;
 
 int posCur;
 
+bool multiusos;
 
+int posm = 8;
 
 
 void asignarVariables() {
 
-pos = 14;
-pos1 = 0;
+pos = 12;
+pos1 = 1;
 
 a = 0;
 a1 = 0;
@@ -107,42 +112,59 @@ h1 = 0;
 rapi = 600;
 fps = 599;
 
-reset = true;
+reset = false;
 pausa = true;
 
 score = 0;
-
 especial = 0;
+
+soltado = false;
+soltado1 = false;
 }
 void setup() {   
   lcd.begin(16,2); // Inicializa la interface para el LCD screen, and determina sus dimensiones (ancho y alto) del display
   lcd.createChar(1, coche);
   lcd.createChar(2, obstaculo);
 }
-void loop() {
+void loop(){
+
+  if(ira == 0){
+    while(juego == true){
+    juego1();
+   }
+    }
+   menuV();
+  }
+void menuV() {
   menu = true; 
+  multiusos = true;
   while (menu == true){
 
   lec1 = digitalRead(10);
   lec2 = digitalRead(9);
   lec3 = digitalRead(8);
 
+  if(multiusos == true){
+    lcd.clear();
+    multiusos = false;
+    }
+  
     if ((lec2 == 1)and(soltado1 == true)){
-      if (pos == 15){
-        pos = 15;
+      if (posm >= 15){
+        posm = 15;
         }
       else {
-        pos = pos +1;
+        posm = posm +1;
         }
       soltado1 = false;
       lcd.clear();
       }
     if ((lec3 == 1)and(soltado == true)){
-      if (pos == 0){
-        pos = 0;
+      if (posm <= 0){
+        posm = 0;
         }
       else {
-        pos = pos -1;
+        posm = posm -1;
         }
       soltado = false;
       lcd.clear();
@@ -152,8 +174,12 @@ void loop() {
     }
     if (lec2 == 0){
     soltado1 = true;
-    }    
-    lcd.setCursor(pos,1); 
+    }  
+    if (lec1 == 0){
+    soltado2 = true;
+    }  
+      
+    lcd.setCursor(posm,1); 
     lcd.write(2);
 
     lcd.setCursor(10,0);
@@ -161,20 +187,16 @@ void loop() {
 
     delay(1);
     
-    if (lec1 == 1){
-      if ((pos < 14)and(pos > 10)){
+    if ((lec1 == 1)and(soltado2 == true)){
+      soltado2 = false;
+      if ((posm < 15)and(posm > 9)){
         juego = true;
-        }
-      else{
-        juego = false;
+        ira = 0;
+        asignarVariables();
+        loop();
         }
       }
-  while(juego == true){
-    
-    juego1();
-    
-   }
-  }
+    }
  }
  void juego1() {
 
@@ -184,7 +206,7 @@ void loop() {
 
   fps = fps +1;
   
-  if ((lec2 == 1)and(soltado == true)){
+  if (((lec2 == 1)and(soltado == true))or((lec1 == 1)and(soltado1 == true))){
     pintar(pos,pos1,3);
     soltado = false;
     if (pos1 == 1){
@@ -199,34 +221,27 @@ void loop() {
   if (lec2 == 0){
     soltado = true;
     }
-  if (lec1 == 0){
+    if (lec1 == 0){
     soltado1 = true;
-    }    
-    
-  if ((lec1 == 1)and(soltado1 == true)){
-    pintar(pos,pos1,3);
-    soltado1 = false;
-    if (pos1 == 1){
-      pos1 = 0;
-      }
-    else if (pos1 == 0){
-      pos1 = 1;
-      }
-      pintar(pos,pos1,1);
     }
     
     if (lec3 == 1){
-    pausa = true;
-    while(pausa == true){
-        lec1 = digitalRead(10);
-        lec2 = digitalRead(9);
-
-        if ((lec1 == 1)or(lec2 == 1)){
-          
-          pausa = false;
-          }
+    if (multiusos == true){
+      pausa = true;
       }
-  }
+    soltado = false;
+    multiusos = false;
+    while(pausa == true){
+        lec3 = digitalRead(8);
+        delay(1);
+        if (lec3 == 0){
+        soltado = true;
+        }
+        if ((lec3 == 1)and(soltado == true)){
+        pausa = false;
+          }
+        }
+      }
 
   if (((pos == a)and(pos1 == a1))or((pos == b)and(pos == b1))or((pos == c)and(pos1 == c1))or((pos == d)and(pos1 == d1))or((pos == e)and(pos1 == e1))or((pos == f)and(pos1 == f1))or((pos == g)and(pos1 == g1))or((pos == h)and(pos1 == h1))){
     pintar(pos,pos1,3);
@@ -239,6 +254,7 @@ void loop() {
   
   if (fps >= rapi){
     fps =0;
+    multiusos = true;
     score = score +1;
 
   subir = subir +1;
@@ -254,7 +270,7 @@ void loop() {
       pos = pos -1;
       subir = 0;
       }
-
+    
     a = a+1;
     b = b+1;
     c = c+1;
@@ -275,8 +291,6 @@ void loop() {
     pintar(g,g1,2);
     pintar(h,h1,2);
     pintar(pos,pos1,1);
-
-    
    
     if (a == 16){
       a = 0;
@@ -319,6 +333,7 @@ void pintar(int pos,int pos1,int dibujo){
 
     if (dibujo == 3){
       
+      lcd.print(" ");
       
       }
       else{
@@ -334,7 +349,7 @@ void gameOver(){
 
     Mejorscore = score;
     }
-  while (reset==true){
+  while (reset = true){
     
     lec3 = digitalRead(8);
   
@@ -357,12 +372,31 @@ void gameOver(){
 
     if (lec3 == 1){
       
-     lcd.setCursor(15,0);
-     lcd.print("o");
+      lcd.setCursor(15,0);
+      lcd.print("o");
+      
+      while (reset == true){
+        lec3 = digitalRead(8);
+        lec1 = digitalRead(10);
+        lec2 = digitalRead(9);
         
-     asignarVariables();
-     reset = false;
-     juego1();
+        if (lec3 == 0){
+        soltado = false;
+        }
+
+      if (lec1 == 1){
+
+      juego = false;
+      menuV();
+      }
+      else if (lec2 == 1){
+        
+      asignarVariables();
+      juego = true;
+      ira = 0;
+      loop();
+            }
+         }
       }
     }
   }
